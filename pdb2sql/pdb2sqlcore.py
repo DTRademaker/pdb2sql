@@ -401,7 +401,7 @@ class pdb2sql(pdb2sql_base):
         print(df.to_csv(sep='\t', index=False))
 
     # get the properties
-    def get(self, columns, tablename='ATOM', **kwargs):
+    def get(self, columns, tablename='ATOM', order=None, **kwargs):
         """Exectute simple SQL query to extract values.
 
         Args:
@@ -410,6 +410,9 @@ class pdb2sql(pdb2sql_base):
                 Avaiable columns:
                     serial, name, altLoc, resName, chainID, resSeq,
                     iCode, x, y, z, occ, temp, element, model
+            
+            order (str): Argument to sort columns. 
+                e.g.: order = 'chainID, resSeq, name'
 
             kwargs: argument to select atoms, dict value must be list,
                 e.g.:
@@ -540,6 +543,11 @@ class pdb2sql(pdb2sql_base):
 
             # stitch the conditions and append to the query
             query += ' AND '.join(conditions)
+            
+            # Make sure the returned values are sorted correctly.
+            # e.g. this is important for correctly comparing the atoms between pdbs
+            if order != None:
+                query += ' ORDER BY %s' % (order)
 
             # error if vals is too long
             if len(vals) > self.SQLITE_LIMIT_VARIABLE_NUMBER:
