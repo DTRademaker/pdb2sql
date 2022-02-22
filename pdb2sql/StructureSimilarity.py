@@ -559,15 +559,19 @@ class StructureSimilarity(object):
 
         # extract the pos of chains A
         xyz_decoy_A = np.array(
-            sql_decoy.get('x,y,z', chainID=chain1, **kwargs))
+            sql_decoy.get('x,y,z', chainID=chain1, 
+            order = 'chainID, resSeq, name', **kwargs))
         xyz_ref_A = np.array(sql_ref.get(
-            'x,y,z', chainID=chain1, **kwargs))
+            'x,y,z', chainID=chain1, 
+            order = 'chainID, resSeq, name', **kwargs))
 
         # extract the pos of chains B
         xyz_decoy_B = np.array(
-            sql_decoy.get('x,y,z', chainID=chain2, **kwargs))
+            sql_decoy.get('x,y,z', chainID=chain2, 
+            order = 'chainID, resSeq, name', **kwargs))
         xyz_ref_B = np.array(sql_ref.get(
-            'x,y,z', chainID=chain2, **kwargs))
+            'x,y,z', chainID=chain2, 
+            order = 'chainID, resSeq, name', **kwargs))
 
         # check the lengthes
         if len(xyz_decoy_A) != len(xyz_ref_A):
