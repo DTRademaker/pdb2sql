@@ -440,6 +440,13 @@ class pdb2sql(pdb2sql_base):
                     raise ValueError(
                         f'Invalid column name {i}. Possible names are\n'
                         f'{self.get_colnames()}')
+        
+        if order != None:
+            for i in order.split(','):
+                if i.strip() not in valid_colnames:
+                    raise ValueError(
+                        f'Invalid column name {i} in "order" argument. Possible names are\n'
+                        f'{self.get_colnames()}')
 
         # the asked keys
         keys = kwargs.keys()
