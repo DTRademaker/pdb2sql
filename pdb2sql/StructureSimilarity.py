@@ -505,8 +505,7 @@ class StructureSimilarity(object):
     ##########################################################################
 
     # compute the L-RMSD
-    def compute_lrmsd_pdb2sql(self, exportpath=None, method='quaternion', **kwargs):
-
+    def compute_lrmsd_pdb2sql(self, exportpath=None, method='svd', **kwargs):
         """Slow routine to compute the L-RMSD.
 
         L-RMSD is computed by aligning the longest chain of the decoy to
@@ -573,7 +572,7 @@ class StructureSimilarity(object):
         xyz_ref_B = np.array(sql_ref.get(
             'x,y,z', chainID=chain2, 
             order = 'chainID, resSeq, name', **kwargs))
-        
+
         # check the lengthes
         if len(xyz_decoy_A) != len(xyz_ref_A):
             xyz_decoy_A, xyz_ref_A = self.get_identical_atoms(
@@ -598,34 +597,18 @@ class StructureSimilarity(object):
 
             xyz_decoy_short = xyz_decoy_A
             xyz_ref_short = xyz_ref_A
-         
-        tref = torch.tensor(xyz_ref_short).clone().numpy()
-        tdecoy = torch.tensor(xyz_decoy_short).clone().numpy()
-        
-        
+
         # get the translation so that both A chains are centered
         tr_decoy = get_trans_vect(xyz_decoy_long)
         tr_ref = get_trans_vect(xyz_ref_long)
-        
-        
 
         # translate everything for 1
         xyz_decoy_short += tr_decoy
         xyz_decoy_long += tr_decoy
-        
-        
 
         # translate everuthing for 2
         xyz_ref_short += tr_ref
         xyz_ref_long += tr_ref
-        
-        #tref = torch.tensor(xyz_ref_short).clone().numpy()
-        #tdecoy = torch.tensor(xyz_decoy_short).clone().numpy()
-        
-        
-        
-        #tref = torch.tensor(xyz_ref_short).clone().numpy()
-        #tdecoy = torch.tensor(xyz_decoy_short).clone().numpy()
 
         # get the ideal rotation matrix
         # to superimpose the A chains
@@ -633,19 +616,11 @@ class StructureSimilarity(object):
             xyz_decoy_long, xyz_ref_long, method=method)
 
         # rotate the entire fragment
-        cent = list(torch.tensor(xyz_ref_long).mean(0).numpy())
         xyz_decoy_short = transform.rotate(
-            xyz_decoy_short, U, center=cent)
-
-        #print(xyz_decoy_short.shape)
-        #print(xyz_ref_short.shape)
-        
-        #tref = torch.tensor(xyz_ref_short).clone().numpy()
-        #tdecoy = torch.tensor(xyz_decoy_short).clone().numpy()
+            xyz_decoy_short, U, center=self.origin)
 
         # compute the RMSD
         lrmsd = self.get_rmsd(xyz_decoy_short, xyz_ref_short)
-        lrmsd2 = self.get_rmsd(tdecoy, tref)
 
         # export the pdb for verifiactions
         if exportpath is not None:
@@ -802,12 +777,12 @@ class StructureSimilarity(object):
 
         # get the xyz and atom identifier of the decoy contact atoms
         xyz_contact_ref = sql_ref.get(
-            rowID=index_contact_ref)
+            'x,y,z', rowID=index_contact_ref)
         data_contact_ref = sql_ref.get(
             'chainID,resSeq,resName,name',
             rowID=index_contact_ref)
 
-        # get the xyz and atom indentifier of the reference
+        # get the xyz and atom indeitifier of the reference
         xyz_decoy = sql_decoy.get('x,y,z')
         data_decoy = sql_decoy.get('chainID,resSeq,resName,name')
 
