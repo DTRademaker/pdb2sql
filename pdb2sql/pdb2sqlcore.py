@@ -411,7 +411,7 @@ class pdb2sql(pdb2sql_base):
                     serial, name, altLoc, resName, chainID, resSeq,
                     iCode, x, y, z, occ, temp, element, model
             
-            order (str): Argument to sort columns. 
+            order (str): argument to sort columns. 
                 e.g.: order = 'chainID, resSeq, name'
 
             kwargs: argument to select atoms, dict value must be list,
