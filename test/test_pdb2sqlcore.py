@@ -393,12 +393,13 @@ class TestPrintGetUpdate(unittest.TestCase):
 
     def test_3_update_cloumn_index(self):
         """Verfity update_column() default."""
-        values = [1., 2., 3.]
+        values = [3., 2., 1.]
+        values_sorted = [1., 2., 3.]
         self.db.update_column(
             "x", values=values, index=list(range(3)))
         result = self.db.get("x", resName='MET',
                              name=['N', 'CA', 'C'])
-        target = values
+        target = values_sorted
         self.assertEqual(result, target)
 
     def test_4_add_cloumn(self):
